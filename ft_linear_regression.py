@@ -1,6 +1,16 @@
 import csv
 import matplotlib.pyplot as plt
 
+class LinearRegression:
+    def __init__(self, X, Y):
+        self.X = X
+        self.Y = Y
+        self.theta0 = 0
+        self.theta1 = 0
+    
+    def predict(self, learningRate):
+        predictY = 
+
 """
 Parse a CSV file containing 2 columns, remove the header and store the
 content of the first and second columns in xValues and yValues respectively.
@@ -23,10 +33,14 @@ def parseCsv (file: str):
         print("File not found: ", file)
     except csv.Error as e:
         print(f"Error reading CSV file: {e}")
+
+    xValues = [int(x) for x in xValues]
+    yValues = [int(y) for y in yValues]
+
     ###
-    print(xValues, yValues)
-    plt.scatter(xValues, yValues)
-    plt.show()
+    # print(xValues, yValues)
+    # plt.scatter(xValues, yValues)
+    # plt.show()
     ###
 
     return (xValues, yValues)
@@ -41,32 +55,29 @@ Parameters:
 - realValues:
 """
 
-def meanSquaredError (size: int, predictedValues: list, realValues: tuple):
+def meanSquaredError (size: int, predictY: list, realValues: tuple):
     mean = 0
     realY = realValues[1]
-    predictY = predictedValues[1]
-    for i in (size - 1):
+    for i in range(size - 1):
         mean += (realY[i] - predictY[i]) ** 2
     mean *= 1 / size
 
     return (mean)
 
-def meanSquareError_derivativeSlope(size: int, predictedValues: list, realValues: tuple):
+def meanSquareError_derivativeSlope(size: int, predictY: list, realValues: tuple):
     mean = 0
+    realX = realValues[0]
     realY = realValues[1]
-    predictX = predictedValues[0]
-    predictY = predictedValues[1]
-    for i in (size - 1):
-        mean += predictX[i] * (realY[i] - predictY[i])
+    for i in range(size - 1):
+        mean += realX[i] * (realY[i] - predictY[i])
     mean *= -2 / size
 
     return (mean)
 
-def meanSquareError_derivativeIntercept(size: int, predictedValues: list, realValues: tuple):
+def meanSquareError_derivativeIntercept(size: int, predictY: list, realValues: tuple):
     mean = 0
     realY = realValues[1]
-    predictY = predictedValues[1]
-    for i in (size - 1):
+    for i in range(size - 1):
         mean += (realY[i] - predictY[i])
     mean *= -2 / size
 
@@ -75,12 +86,18 @@ def meanSquareError_derivativeIntercept(size: int, predictedValues: list, realVa
 if __name__ == "__main__":
 
     epochs = 1000
-    learning_rate = 0.0001
+    learningRate = 0.0001
 
-    predictedY = []
+    predictY = []
     realX, realY = parseCsv('data.csv')
+    size = len(realX)
     realValues = (realX, realY)
     theta0, theta1 = 0, 0   # f(x) = theta1 * x + theta0
 
-    # for i in range(epochs):
-    #     predictY = theta1 * realX
+    for i in range(epochs):
+        predictY = [theta1 * x + theta0 for x in realX]
+        print("theta0: ", theta0)
+        print("theta1: ", theta1)
+        theta0 = theta0 - learningRate * meanSquareError_derivativeIntercept(size, predictY, realValues)
+        theta1 = theta1 - learningRate * meanSquareError_derivativeSlope(size, predictY, realValues)
+        print("mse: ", meanSquaredError(size, predictY, realValues))
