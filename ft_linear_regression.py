@@ -163,20 +163,20 @@ def gradientDescent(regressor: LinearRegression, learningRate: float):
     return meanSquaredError(regressor, predictY)
 
 
-def printData(regresssor: LinearRegression, mse: list, X: list, Y: list):
+def printData(theta0: float, theta1:float, mse: list):
     print("\n=========== Values ===========")
-    print(f"theta0: {regressor.theta0}\ntheta1: {regressor.theta1}\n")
+    print(f"theta0: {theta0}\ntheta1: {theta1}\n")
     print(f"Mean squared error: {mse[-1]}")
     print("==============================")
     return
 
 
-def plotData(X: list, Y: list):
+def plotData(theta0: float, theta1: float, X: list, Y: list):
     x_values = [min(X), max(X)]
-    y_values = [regressor.theta1 * x + regressor.theta0 for x in x_values]
+    y_values = [theta1 * x + theta0 for x in x_values]
     plt.scatter(X, Y)
     plt.title('Linear Regression')
-    plt.plot(x_values, y_values, label=f'y = {regressor.theta1}x + {regressor.theta0}')
+    plt.plot(x_values, y_values, label=f'y = {theta1}x + {theta0}')
     plt.xlabel('x')
     plt.ylabel('y')
     plt.grid(True)
@@ -184,17 +184,20 @@ def plotData(X: list, Y: list):
 
     return
 
+def denormalizeCoeff(regressor: LinearRegression, X: list, Y: list):
+    theta1_denorm = regressor.theta1 * np.std(Y) / np.std(X)
+    theta0_denorm = np.mean(Y) - theta1_denorm * np.mean(X)
+
+    return (theta0_denorm, theta1_denorm)
 
 if __name__ == "__main__":
-
 
     if (len(sys.argv) > 3):
         epochs = int(sys.argv[1])
         learningRate = float(sys.argv[2])
     else:
         epochs = 1000
-        learningRate = 0.01
-
+        learningRate = 0.1
 
     X, Y = parseCsv('data.csv')
     Xn = nomalizeData(X)
@@ -205,12 +208,11 @@ if __name__ == "__main__":
     for i in range(epochs):
         mse.append(gradientDescent(regressor, learningRate))
 
-    regressor.theta1 = regressor.theta1 * np.std(Y) / np.std(X)
-    regressor.theta0 = np.mean(Y) - regressor.theta1 * np.mean(X)
-    printData(regressor, mse, X, Y)
-    plotData(X, Y)
+    theta0, theta1 = denormalizeCoeff(regressor, X, Y)
+    printData(theta0, theta1, mse)
+    plotData(theta0, theta1, X, Y)
 
     with open('theta.csv', 'w') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(['theta0', 'theta1'])
-        writer.writerow([regressor.theta0, regressor.theta1])
+        writer.writerow([theta0, theta1])
