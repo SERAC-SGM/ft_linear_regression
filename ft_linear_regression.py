@@ -174,11 +174,12 @@ def printData(theta0: float, theta1:float, mse: list):
 def plotData(theta0: float, theta1: float, X: list, Y: list):
     x_values = [min(X), max(X)]
     y_values = [theta1 * x + theta0 for x in x_values]
-    plt.scatter(X, Y)
-    plt.title('Linear Regression')
+    plt.scatter(X, Y, None, None, '+')
+    plt.title('Price prediction based on mileage')
+    plt.legend(['Real values'])
     plt.plot(x_values, y_values, label=f'y = {theta1}x + {theta0}')
-    plt.xlabel('x')
-    plt.ylabel('y')
+    plt.xlabel('x (mileage)')
+    plt.ylabel('y (price)')
     plt.grid(True)
     plt.show()
 
@@ -192,12 +193,14 @@ def denormalizeCoeff(regressor: LinearRegression, X: list, Y: list):
 
 if __name__ == "__main__":
 
-    if (len(sys.argv) > 3):
+    if (len(sys.argv) > 2):
         epochs = int(sys.argv[1])
         learningRate = float(sys.argv[2])
     else:
         epochs = 1000
         learningRate = 0.1
+
+    print(f"\nEpochs: {epochs}\nLearning rate: {learningRate}")
 
     X, Y = parseCsv('data.csv')
     Xn = nomalizeData(X)
