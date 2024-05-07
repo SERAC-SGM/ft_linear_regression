@@ -7,6 +7,10 @@ class  DataMismatchError(Exception):
     """Exception raised when CSV data columns have unequal lengths"""
     pass
 
+class EmptyFileError(Exception):
+    """Exception raised when CSV file is empty"""
+    pass
+
 
 class LinearRegression:
     """
@@ -45,6 +49,9 @@ def parseCsv (file: str):
     xValues, yValues = (), ()
     try:
         with open(file, 'r') as csv_file:
+            if csv_file.readline() == '':
+                raise EmptyFileError("CSV file is empty")
+            csv_file.seek(0)
             reader = csv.reader(csv_file)
             next(reader)
             xValues, yValues = zip(*reader)
@@ -203,6 +210,9 @@ if __name__ == "__main__":
     print(f"\nEpochs: {epochs}\nLearning rate: {learningRate}")
 
     X, Y = parseCsv('data.csv')
+    if len(X) == 0 or len(Y) == 0:
+        print("Empty dataset")
+        exit()
     Xn = nomalizeData(X)
     Yn = nomalizeData(Y)
     regressor = LinearRegression(Xn, Yn)

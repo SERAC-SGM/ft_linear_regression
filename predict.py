@@ -13,8 +13,13 @@ def predict(regressor: ft_lr.LinearRegression):
 
 if __name__ == "__main__":
     
+    theta0 = 0
+    theta1 = 0
     X, Y = ft_lr.parseCsv("theta.csv")
-    theta0 = X[0]
-    theta1 = Y[0]
+    if (len(X) == 0):
+        print("No data to process")
+    else:
+        theta0 = X[0]
+        theta1 = Y[0]
     regressor = ft_lr.LinearRegression((),(),theta0, theta1)
     predict(regressor)
